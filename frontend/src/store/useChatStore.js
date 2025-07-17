@@ -11,11 +11,14 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  getUsers: async () => {
+  getUsers: async (page = 1, pageOffset = 10) => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/users");
-      set({ users: res.data || [] });
+      const res = await axiosInstance.get("/messages/users", {
+        params: { page, pageoffset: pageOffset },
+      });
+      // Store both users and pagination info
+      set({ users: res.data || {} });
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {

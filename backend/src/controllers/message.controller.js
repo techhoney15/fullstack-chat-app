@@ -6,12 +6,31 @@ import { getReceiverSocketId, io } from "../lib/socket.js";
 export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
+    const page = parseInt(req.query.page) > 0 ? parseInt(req.query.page) : 1;
+    const pageOffset = parseInt(req.query.pageoffset) > 0 ? parseInt(req.query.pageoffset) : 10;
+
+    const skip = (page - 1) * pageOffset;
+
+    const totalUsers = await User.countDocuments({
+      _id: { $ne: loggedInUserId },
+    });
+
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
-    }).select("-password");
+    })
+      .select("-password")
+      .skip(skip)
+      .limit(pageOffset);
+
     return res.status(200).json({
       message: "Users fetched successfully",
       data: filteredUsers,
+      pagination: {
+        total: totalUsers,
+        page,
+        pageOffset,
+        totalPages: Math.ceil(totalUsers / pageOffset),
+      },
     });
   } catch (error) {
     console.error("Error fetching users for sidebar:", error);

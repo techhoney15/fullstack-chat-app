@@ -98,6 +98,20 @@ const seedUsers = [
     password: "123456",
     profilePic: "https://randomuser.me/api/portraits/men/7.jpg",
   },
+  // 500 more users generated programmatically
+  ...Array.from({ length: 5000 }).map((_, i) => {
+    const idx = i + 1;
+    const gender = idx % 2 === 0 ? "men" : "women";
+    const picNum = ((idx - 1) % 99) + 1; // randomuser.me has 99 images per gender
+    const email = `user${idx}@example.com`;
+    const fullName = `User${idx} ${gender === "men" ? "Male" : "Female"}`;
+    return {
+      email,
+      fullName,
+      password: "123456",
+      profilePic: `https://randomuser.me/api/portraits/${gender}/${picNum}.jpg`,
+    };
+  }),
 ];
 
 const seedDatabase = async () => {
